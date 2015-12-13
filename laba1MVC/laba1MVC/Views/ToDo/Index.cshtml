@@ -1,0 +1,55 @@
+﻿@model ICollection<laba1MVC.Models.ToDoModel>
+
+<script>
+    function handleClick(cb) {
+        $.ajax({
+            url:"@Url.Action("SetChecked","ToDo")",
+            type: 'POST',
+            contentType: 'application/json;',
+            data: JSON.stringify({ toDo: cb.name, value: cb.checked}),
+            success: function (valid) {
+                if (valid) {
+                    location.reload(true);
+                } else {
+                    //show that id is not valid 
+                }
+            }
+        });
+    }      
+</script>
+
+<h2>Todos</h2>
+
+
+
+<body> 
+    @Model.Count(x=>x.State == false) of @Model.Count() remaining<br />
+    @foreach (laba1MVC.Models.ToDoModel item in Model)
+    {
+        @Html.CheckBox(item.ToDo, item.State, new {@onclick = "handleClick(this)" })
+        if (item.State == true)
+        {
+            @Html.Label(item.ToDo, new { @class = "done-true" })
+        }
+         else
+        {
+            @Html.Label(item.ToDo)
+        }
+        @Html.ActionLink("Delete", "Delete", "ToDo" ,new { toDo = item.ToDo }, null)
+
+        <br />
+    }
+    @using (Html.BeginForm("Save","ToDo",FormMethod.Post))
+    {
+         @Html.TextBox("ToDo");
+        <input type="submit" value="Add" />             
+    }
+    <br />
+    @Html.ActionLink("Clear complited", "ClearCompleted", "ToDo")
+
+    @Html.ActionLink("All", "Sort", "ToDo", new {condition = "All" }, null)
+    @Html.ActionLink("Active", "Sort", "ToDo", new {condition = "Active" }, null)
+    @Html.ActionLink("Completed", "Sort", "ToDo", new {condition = "Completed" }, null)
+    
+</body>
+

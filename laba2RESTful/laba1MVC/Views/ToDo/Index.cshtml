@@ -1,0 +1,68 @@
+﻿@model ICollection<laba1MVC.Models.ToDoModel>
+
+<script>
+    function handleClick(cb) {
+        $.ajax({
+            url:"@Url.Action("SetChecked","ToDo")",
+            type: 'POST',
+            contentType: 'application/json;',
+            data: JSON.stringify({ toDo: cb.name, value: cb.checked}),
+            success: function (valid) {
+                if (valid) {
+                    location.reload(true);
+                } else {
+                    //show that id is not valid 
+                }
+            }
+        });
+    }      
+</script>
+
+<h2>Todos</h2>
+
+
+
+<body> 
+
+   <div id="content"></div> 
+    @using (Html.BeginForm("Save","ToDo",FormMethod.Post))
+    {
+         @Html.TextBox("ToDo");
+        <input type="submit" value="Add" />             
+    }
+    <br />
+    @Html.ActionLink("Clear complited", "ClearCompleted", "ToDo")
+
+    @Html.ActionLink("All", "Sort", "ToDo", new {condition = "All" }, null)
+    @Html.ActionLink("Active", "Sort", "ToDo", new {condition = "Active" }, null)
+    @Html.ActionLink("Completed", "Sort", "ToDo", new {condition = "Completed" }, null)
+</body>
+
+@section scripts {
+<script>
+
+    var apiCustomers = 'api/RestApi';
+    $(document).ready(function () {
+        // Send an AJAX request
+        var rows = '';
+       // $('#content').empty();
+
+        $.getJSON(apiCustomers,
+            function (data) {
+                $.each(data, function (key, val) {
+                    var state ='';
+                    if (val.State == true)
+                        state = 'checked';
+                    else
+                        state = '';
+                    var url = '/ToDo/Delete?ToDo=' + val.ToDo;
+                    rows = rows + 
+                        '<input type="checkbox" name = "' + val.ToDo + '" onclick = "handleClick(this)" ' + state + ' />' + val.ToDo 
+                        +' <a href="'+url+'">Delete</a>' + '<br>';
+                });
+                $("#content").append(rows);
+            });
+    });
+</script>
+}
+
